@@ -5,12 +5,12 @@ import torch.nn as nn
 from arcface import ArcMarginProduct
 import pytorch_lightning as pl
 
-# Create DL model
+# Create the model for the trunk
 class ReidModel(pl.LightningModule):
-    def __init__(self, backbone_model,number_classes, embedding,arcface):
+    def __init__(self, backbone_model,number_classes, embedding_size,arcface):
         super(ReidModel,self).__init__()
         self.number_classes = number_classes
-        self.embedding = embedding
+        self.embedding_size = embedding_size
         self.arcface =  arcface
 
         # Define the model
@@ -26,15 +26,14 @@ class ReidModel(pl.LightningModule):
         num_filters = self.backbone.fc.in_features
         self.backbone = torch.nn.Sequential(*(list(self.backbone.children())[:-1])) 
         # Use the pretrained model to classify and change the output of last layer
-        self.adaptor = nn.Linear(num_filters, self.embedding)
-        self.bn = nn.BatchNorm1d(self.embedding)
-        self.embedding_fc = nn.utils.weight_norm(nn.Linear(self.embedding,self.embedding,bias=False), name='weight')
-        self.final_fc = nn.utils.weight_norm(nn.Linear(self.embedding, self.number_classes, bias=False),name='weight')
+        self.adaptor = nn.Linear(num_filters, self.embedding_size)
+        self.bn = nn.BatchNorm1d(self.embedding_size)
+        self.embedding_fc = nn.utils.weight_norm(nn.Linear(self.embedding_size,self.embedding_size,bias=False), name='weight')
+        self.final_fc = nn.utils.weight_norm(nn.Linear(self.embedding_size, self.number_classes, bias=False),name='weight')
         
-        # If arcface is needed
+        # If arcface is needed, we include this layer
         if self.arcface:
-            self.arcface_layer = ArcMarginProduct(in_features = self.embedding ,out_features = self.number_classes)
-
+            self.arcface_layer = ArcMarginProduct(in_features = self.embedding_size,out_features = self.number_classes)
 
     def forward(self, x, target = None):
         representations = self.backbone(x)
@@ -50,8 +49,9 @@ class ReidModel(pl.LightningModule):
 
 # Create trunk DL model
 class ReidTrunkModel(pl.LightningModule):
-    def __init__(self):
+    def __init__(self,embedding_size):
         super(ReidTrunkModel,self).__init__()
+        self.embedding_size = embedding_size
 
         # Define the model
         self.backbone = models.resnet34(weights="DEFAULT")
@@ -83,14 +83,15 @@ class ReidTrunkModel(pl.LightningModule):
         # Put zeros if trunk is a black image
         for idx, trunk_image in enumerate(x):
             if (trunk_image == torch.zeros((3, 64,128) , dtype=torch.float, device = 'cuda:0')).all():
-                body_feature[idx] = torch.zeros((2560), dtype=torch.float, device = 'cuda:0')
+                body_feature[idx] = torch.zeros((self.embedding_size), dtype=torch.float, device = 'cuda:0')
 
+        # Return the final embedding
         return body_feature
 
 
 # Create limbs DL model
 class ReidLimbsModel(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, embedding_size):
         super(ReidLimbsModel,self).__init__()
 
         # Define the backbones
