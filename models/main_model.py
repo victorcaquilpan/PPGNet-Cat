@@ -5,7 +5,7 @@ from reid_models import ReidModel, ReidTrunkModel,ReidLimbsModel
 
 ### Load the main model
 class ReidMainModel(pl.LightningModule):
-    def __init__(self, backbone_model,number_classes, embedding_size,arcface = True):
+    def __init__(self, backbone_model,number_classes, embedding_size,arcface = False):
         super(ReidMainModel, self).__init__()   
         
         # Set variables
