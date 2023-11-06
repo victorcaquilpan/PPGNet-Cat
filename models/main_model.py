@@ -1,6 +1,6 @@
 import pytorch_lightning as pl
 import torch.nn as nn
-from reid_models import ReidModel, ReidTrunkModel,ReidLimbsModel
+from .reid_models import ReidModel, ReidTrunkModel,ReidLimbsModel
 
 
 ### Load the main model
@@ -18,8 +18,8 @@ class ReidMainModel(pl.LightningModule):
         self.automatic_optimization = False
     
         # Define the model
-        self.model = ReidModel(backbone_model=self.backbone_model,number_classes = self.number_classes,embedding_size = self.embedding_size, arcface = self.arcface)
-        self.trunk_model = ReidTrunkModel(embedding_size=embedding_size)
+        self.full_image_model = ReidModel(backbone_model=self.backbone_model,number_classes = self.number_classes,embedding_size = self.embedding_size, arcface = self.arcface)
+        self.trunk_model = ReidTrunkModel(embedding_size=self.embedding_size)
         self.limbs_model = ReidLimbsModel()
 
         # Create a function to initializate bottleneck
@@ -54,8 +54,8 @@ class ReidMainModel(pl.LightningModule):
         self.bottleneck.apply(weights_init_kaiming)
         self.classifier.apply(weights_init_classifier)
 
-    def full_model(self,full,trunk, left_leg, right_leg, left_thig, right_thig, left_shank, right_shank,front_tail,rear_tail,label = None):
-        logits, embedding  = self.model(full, label)
+    def forward(self,full,trunk, left_leg, right_leg, left_thig, right_thig, left_shank, right_shank,front_tail,rear_tail,label = None):
+        logits, embedding  = self.full_image_model(full, label)
         embedding_trunk = self.trunk_model(trunk)
         embedding_paw = self.limbs_model(left_leg, right_leg, left_thig, right_thig, left_shank, right_shank, front_tail, rear_tail)
 
@@ -73,9 +73,4 @@ class ReidMainModel(pl.LightningModule):
             
         # Return
         return logits, logits_trunk, logits_limbs, embedding, trunk_features, limbs_features
-        
-    # Define forward step
-    def forward(self, x, label = None):
-        classify, embedding = self.model(x,label)
-        return classify, embedding
     

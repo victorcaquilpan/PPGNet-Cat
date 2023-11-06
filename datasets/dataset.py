@@ -6,11 +6,11 @@ import numpy as np
 import albumentations as albu
 from albumentations.pytorch import ToTensorV2
 import cv2
-from crop_images import trunk_extraction, limbs_extraction
+from .crop_images import trunk_extraction, limbs_extraction
 
 # Create a Reid Dataset
 class ReidDataset(Dataset):
-    def __init__(self,data_directory: str,transform_type: str = None, subset: str = 'train',resized_full_image: tuple = (256,512),resized_trunk_image: tuple = (64,128),resized_limb_image: tuple = (64,64), mirrowed_images: bool = True,include_cat_keypoints = False):
+    def __init__(self,data_directory: str,transform_type: bool = False, subset: str = 'train',resized_full_image: tuple = (256,512),resized_trunk_image: tuple = (64,128),resized_limb_image: tuple = (64,64), mirrowed_images: bool = True,include_cat_keypoints = False):
         # Save the train state
         self.subset = subset
         self.resized_full_image = resized_full_image
@@ -50,7 +50,7 @@ class ReidDataset(Dataset):
         # Check potential transformations
         self.transform_type = transform_type
         # Define the transformation 
-        if self.transform_type == "best":
+        if self.transform_type:
             self.transform = albu.Compose([
                 albu.SomeOf([
                     albu.GaussianBlur(sigma_limit=(0,1.5)),
@@ -68,13 +68,72 @@ class ReidDataset(Dataset):
                     ToTensorV2()
                     ])
                 ])
+            
+            # Define transformations for trunk
+            self.transform_trunk = albu.Compose([
+                albu.SomeOf([
+                    albu.GaussianBlur(sigma_limit=(0,1.5)),
+                    albu.GaussNoise(mean = 0, var_limit=(0.0, 2.55**2), per_channel=True, p = 0.5),
+                    albu.augmentations.CoarseDropout(max_height=0.2, max_width=0.2,max_holes=4),
+                    albu.PiecewiseAffine(scale=(0.01, 0.03)),
+                    albu.Perspective(scale=(0.01, 0.1)),
+                    ],n=2),
+                albu.Sequential([
+                    albu.augmentations.Resize(self.resized_trunk_image[0],self.resized_trunk_image[1]),
+                    albu.ToFloat(max_value=255.0),
+                    albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
+                    albu.augmentations.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+                    albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
+                    ToTensorV2()
+                    ])
+                ])
+            
+            # Define trasnformations for limbs
+            self.transform_limb = albu.Compose([
+                albu.SomeOf([
+                    albu.GaussianBlur(sigma_limit=(0,1.5)),
+                    albu.GaussNoise(mean = 0, var_limit=(0.0, 2.55**2), per_channel=True, p = 0.5),
+                    albu.augmentations.CoarseDropout(max_height=0.2, max_width=0.2,max_holes=4),
+                    albu.PiecewiseAffine(scale=(0.01, 0.03)),
+                    albu.Perspective(scale=(0.01, 0.1)),
+                    ],n=2),
+                albu.Sequential([
+                    albu.augmentations.Resize(self.resized_limb_image[0],self.resized_limb_image[1]),
+                    albu.ToFloat(max_value=255.0),
+                    albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
+                    albu.augmentations.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+                    albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
+                    ToTensorV2()
+                    ])
+                ])
+            
         # Consider a default transformation
         else:
+            # Define trasnformations for full image
             self.transform = albu.Compose([
             albu.ToFloat(max_value=255.0),
             albu.augmentations.Resize(self.resized_full_image[0],self.resized_full_image[1]),
             albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
             ToTensorV2()])
+
+            # Define trasnformations for trunk
+            self.transform_trunk = albu.Compose([
+                albu.augmentations.Resize(self.resized_trunk_image[0],self.resized_trunk_image[1]),
+                albu.ToFloat(max_value=255.0),
+                albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
+                albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
+                ToTensorV2()
+                ])
+            
+            # Define trasnformations for limbs
+            self.transform_limb = albu.Compose([                
+                    albu.augmentations.Resize(self.resized_limb_image[0],self.resized_limb_image[1]),
+                    albu.ToFloat(max_value=255.0),
+                    albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
+                    albu.augmentations.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+                    albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
+                    ToTensorV2()
+                    ])
 
         # Define the transformation for test
         self.transform_test = albu.Compose([
@@ -82,45 +141,6 @@ class ReidDataset(Dataset):
             albu.augmentations.Resize(self.resized_full_image[0],self.resized_full_image[1]),
             albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
             ToTensorV2()])
-        
-        # Define transformations for trunk
-        self.transform_trunk = albu.Compose([
-            albu.SomeOf([
-                albu.GaussianBlur(sigma_limit=(0,1.5)),
-                albu.GaussNoise(mean = 0, var_limit=(0.0, 2.55**2), per_channel=True, p = 0.5),
-                albu.augmentations.CoarseDropout(max_height=0.2, max_width=0.2,max_holes=4),
-                albu.PiecewiseAffine(scale=(0.01, 0.03)),
-                albu.Perspective(scale=(0.01, 0.1)),
-                ],n=2),
-            albu.Sequential([
-                albu.augmentations.Resize(self.resized_trunk_image[0],self.resized_trunk_image[1]),
-                albu.ToFloat(max_value=255.0),
-                albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
-                albu.augmentations.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-                albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
-                ToTensorV2()
-                ])
-            ])
-            
-        # Define trasnformations for limbs
-        self.transform_limb = albu.Compose([
-            albu.SomeOf([
-                albu.GaussianBlur(sigma_limit=(0,1.5)),
-                albu.GaussNoise(mean = 0, var_limit=(0.0, 2.55**2), per_channel=True, p = 0.5),
-                albu.augmentations.CoarseDropout(max_height=0.2, max_width=0.2,max_holes=4),
-                albu.PiecewiseAffine(scale=(0.01, 0.03)),
-                albu.Perspective(scale=(0.01, 0.1)),
-                ],n=2),
-            albu.Sequential([
-                albu.augmentations.Resize(self.resized_limb_image[0],self.resized_limb_image[1]),
-                albu.ToFloat(max_value=255.0),
-                albu.Rotate(10,border_mode=cv2.BORDER_CONSTANT),
-                albu.augmentations.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-                albu.transforms.Normalize(mean = (0.485, 0.456, 0.406),std = (0.229, 0.224, 0.225), max_pixel_value=1.0),
-                ToTensorV2()
-                ])
-            ])
- 
  
     def __getitem__(self,index):
         # Chose images. img_tuple contains image's path and class.

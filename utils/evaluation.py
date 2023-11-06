@@ -7,10 +7,14 @@ from sklearn.metrics import average_precision_score
 
 def eval_impl(anno,res,partial=False):
     random.seed(114514)
+    
     with open(anno,'r') as f:
         anno=json.load(f)
+
+
     with open(res,'r') as f:
         res=json.load(f)
+
     eids,fids={},{}
     query_multi=[]
     query_sing=[]
@@ -67,17 +71,12 @@ def eval_impl(anno,res,partial=False):
         else:
             cmc_sing[k:]  += 1
     mean_ap_sing = np.mean(aps_sing)
-    mean_ap_multi = np.mean(aps_multi)
     top1_sing=cmc_sing[0]/len(query_sing)
     top5_sing=cmc_sing[4]/len(query_sing)
-    top1_multi=cmc_multi[0]/len(query_multi)
-    top5_multi=cmc_multi[4]/len(query_multi)
+
     return {'mAP(single_cam)':mean_ap_sing,
             'top-1(single_cam)':top1_sing,
-            'top-5(single_cam)':top5_sing,
-            'mAP(cross_cam)':mean_ap_multi,
-            'top-1(cross_cam)':top1_multi,
-            'top-5(cross_cam)':top5_multi}
+            'top-5(single_cam)':top5_sing}
 
 
 def exclude(eid,fid,eids,fids):
@@ -127,6 +126,7 @@ def evaluate(anno, res, phase_codename, **kwargs):
             'is_public': False,
             'submission_result_file': 'https://abc.xyz/path/result/file.json',
             'id': 123,
+            
             'submitted_at': u'2017-03-20T19:22:03.880652Z'
         }
     """

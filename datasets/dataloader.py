@@ -1,11 +1,11 @@
 # Import libraries
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
-from dataset import ReidDataset
+from .dataset import ReidDataset
 
 # Create LightninDataModule Class
 class ReidDataModule(pl.LightningDataModule):
-    def __init__(self,data_directory: str,batch_size_train: int,batch_size_test: int,transform: str,num_workers: int, size_full_image, size_trunk_image,size_limb_image,mirrowed_images, include_cat_keypoints):
+    def __init__(self,data_directory: str,batch_size_train: int,batch_size_test: int,transform: bool,num_workers: int, size_full_image, size_trunk_image,size_limb_image,mirrowed_images, include_cat_keypoints):
         self.data_directory = data_directory
         self.batch_size_train = batch_size_train
         self.batch_size_test = batch_size_test

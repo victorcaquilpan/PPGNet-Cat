@@ -4,20 +4,21 @@ import torch
 import torch.nn as nn
 from losses.triplet_loss import CrossEntropyLabelSmooth
 import pytorch_lightning as pl
-from main_model import ReidMainModel
+from .main_model import ReidMainModel
 from torch import optim
 from optim import lr_scheduler
 
 
 ### Load the main model
 class ReidCatModel(pl.LightningModule):
-    def __init__(self, backbone_model,number_classes, embedding_size,steps_main_opt,lr_main = 3e-4,arcface = True, num_epochs = 50,sch_gamma = 0.5, sch_warmup_factor = 0.01,sch_warmup_iter = 25):
+    def __init__(self, backbone_model,number_classes, embedding_size,main_loss,steps_main_opt,lr_main = 3e-4,arcface = True, num_epochs = 50,sch_gamma = 0.5, sch_warmup_factor = 0.01,sch_warmup_iter = 25):
         super(ReidCatModel, self).__init__()   
         
         # Set variables
         self.backbone_model = backbone_model
         self.number_classes = number_classes
         self.embedding_size = embedding_size
+        self.main_loss = main_loss
         self.steps_main_opt = steps_main_opt
         self.sch_gamma = sch_gamma
         self.sch_warmup_factor = sch_warmup_factor
@@ -49,7 +50,7 @@ class ReidCatModel(pl.LightningModule):
         
     # Define forward step
     def forward(self, x, label = None):
-        classify, embedding = self.model.forward(x,label)
+        classify, embedding = self.model.full_image_model(x,label)
         return classify, embedding
     
     # Training step
@@ -62,7 +63,7 @@ class ReidCatModel(pl.LightningModule):
         logits_full, logits_trunk, logits_limbs, embedding, trunk_features, limbs_features  = self.model(image, trunk, left_leg, right_leg, left_thig, right_thig, left_shank, right_shank,front_tail,rear_tail, label)
 
         # Using best model
-        id_g, id_gb, id_gp, triplet_gb, triplet_gp = loss_fn(logits_full, logits_trunk, logits_limbs, trunk_features, limbs_features, label)
+        id_g, id_gb, id_gp, triplet_gb, triplet_gp = self.main_loss(logits_full, logits_trunk, logits_limbs, trunk_features, limbs_features, label)
         train_loss = id_g + 1.5 *id_gb + 1.5 * id_gp + 2 * triplet_gb + 2 * triplet_gp
         
         # Run main optimizer

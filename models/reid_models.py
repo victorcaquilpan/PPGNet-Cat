@@ -2,8 +2,8 @@
 import torch
 from torchvision import models
 import torch.nn as nn
-from arcface import ArcMarginProduct
 import pytorch_lightning as pl
+from .arcface import ArcMarginProduct
 
 # Create the model for the trunk
 class ReidModel(pl.LightningModule):
@@ -83,7 +83,7 @@ class ReidTrunkModel(pl.LightningModule):
 
 # Create limbs DL model
 class ReidLimbsModel(pl.LightningModule):
-    def __init__(self, embedding_size):
+    def __init__(self):
         super(ReidLimbsModel,self).__init__()
 
         # Define the backbones

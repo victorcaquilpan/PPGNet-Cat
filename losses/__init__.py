@@ -160,7 +160,7 @@ def make_loss_with_parameters(num_classes):
         'IMS_PER_BATCH' : 32,
         'DATALOADER_NUM_INSTANCE' : 4,
         'IF_LABELSMOOTH': 'on',
-        'MODEL_NAME' : 'resnet50',
+        'MODEL_NAME' : 'resnet152',
         'SOLVER_RANGE_K' : 2,
         'SOLVER_RANGE_MARGIN': 0.3,
         'SOLVER_RANGE_ALPHA': 0,
@@ -183,7 +183,7 @@ def make_loss_with_center_with_parameters(num_classes):
         'IMS_PER_BATCH' : 32,
         'DATALOADER_NUM_INSTANCE' : 4,
         'IF_LABELSMOOTH': 'on',
-        'MODEL_NAME' : 'resnet50',
+        'MODEL_NAME' : 'resnet152',
         'SOLVER_RANGE_K' : 2,
         'SOLVER_RANGE_MARGIN': 0.3,
         'SOLVER_RANGE_ALPHA': 0,
@@ -191,5 +191,5 @@ def make_loss_with_center_with_parameters(num_classes):
         'SOLVER_CENTER_LOSS_WEIGHT': 0.0005,
         'SOLVER_RANGE_LOSS_WEIGHT': 1}
     
-    loss_func = make_loss_with_center(PARAMETERS,num_classes=num_classes)
+    loss_func, center_criterion = make_loss_with_center(PARAMETERS,num_classes=num_classes)
     return loss_func

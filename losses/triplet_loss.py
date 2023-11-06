@@ -27,22 +27,18 @@ def euclidean_dist(x, y):
       dist: pytorch Variable, with shape [m, n]
     """
     m, n = x.shape[0], y.shape[0]
-    xx = torch.pow(x, 2).sum(1, keepdim=True).expand(m, n)
-    yy = torch.pow(y, 2).sum(1, keepdim=True).expand(n, m).t()
-    dist = xx + yy
-
-
-    # xx = xx.to(torch.float16)
-    # yy = yy.to(torch.float16)
-    #dist = dist.to(torch.float16)
-
-    # print(xx.dtype)
-    # print(yy.dtype)
-    # print(x.dtype)
-    # print(y.dtype)
- 
-    dist.addmm_(1, -2, x, y.t())
+    
+    # Compute the L2 norm of each row in x and y
+    xx = torch.norm(x, p=2, dim=1, keepdim=True)
+    yy = torch.norm(y, p=2, dim=1, keepdim=True).t()
+    
+    # Compute the pairwise dot product between x and y
+    xy = torch.mm(x, y.t())
+    
+    # Compute the Euclidean distance
+    dist = xx**2 - 2 * xy + yy**2
     dist = dist.clamp(min=1e-12).sqrt()  # for numerical stability
+    
     return dist
 
 
