@@ -59,14 +59,6 @@ class ReidTrunkModel(pl.LightningModule):
 
         # Define gap
         self.gap = nn.AdaptiveAvgPool2d((1, 10))
-        self.gap1 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap2 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap3 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap4 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap5 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap6 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap7 = nn.AdaptiveAvgPool2d((1, 1))
-        self.gap8 = nn.AdaptiveAvgPool2d((1, 1))
         self.num_part = 10
 
     def forward(self, x):
