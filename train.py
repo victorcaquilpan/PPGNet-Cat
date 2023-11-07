@@ -64,7 +64,7 @@ class Config():
 
 
 # Creating dataloader
-tiger_data = ReidDataModule(data_directory=Config(),
+cat_data = ReidDataModule(data_directory=Config(),
                             batch_size_train = Config().batch_size_train,
                             batch_size_test = Config().batch_size_test,
                             transform=Config().transformation,
@@ -75,7 +75,7 @@ tiger_data = ReidDataModule(data_directory=Config(),
                             mirrowed_images = Config().mirrowed_data,
                             include_cat_keypoints=Config().include_cat_keypoints)
 # Call the setup method
-tiger_data.setup()
+cat_data.setup()
 
 
 # Create our main loss function
@@ -141,45 +141,13 @@ trainer = Trainer(max_epochs=Config().number_epochs,
 if Config.retrain:
     # Training
     trainer.fit(model = model,
-            train_dataloaders=tiger_data.train_dataloader(),
-            val_dataloaders=tiger_data.val_dataloader())
+            train_dataloaders=cat_data.train_dataloader(),
+            val_dataloaders=cat_data.val_dataloader())
 
-# Evaluation of model
-predictions = trainer.predict(model,dataloaders=tiger_data.test_dataloader())
- 
-# Create a empty matrix
-dist_matrix = np.zeros((len(model.pred_img_id),len(model.pred_img_id)))
+# Save the weights and biases    
+torch.save(model.model.full_image_model.state_dict(),'pretrained_weights/eval_model.pth')
 
-for query_im in range(0, len(model.pred_img_id)):
-    for collection_im in range(0,len(model.pred_img_id)):
-        dist_matrix[query_im,collection_im] = cosine_similarity(model.pred_embeddings[query_im].cpu().numpy(), model.pred_embeddings[collection_im].cpu().numpy())
+# Printing message
+print('Training was done successfully! Model was saved in "pretrained weights directory"')
+    
 
-# Get the reranked distance matrix
-reranked_dist = re_ranking(dist_matrix, dist_matrix, dist_matrix, k1=20, k2=6, lambda_value=0.3)
-
-# Create output list
-prediction_cat_results = []
-
-# Calculate the distance between the query image and each one the the remaining images
-for query_im in range(0, len(model.pred_img_id)):
-    # Create a dictionary
-    dict_query = {"query_id": int(model.pred_img_id[query_im])}
-    # Save the results in a list
-    result_query = []
-    # Calculate the distance over the remaining images
-    for ans_img in range(0, len(model.pred_img_id)):
-        if query_im != ans_img:
-            img_dist = (int(model.pred_img_id[ans_img]) , reranked_dist[query_im,ans_img])
-            result_query.append(img_dist)
-    # Sort images
-    result_query = sorted(result_query, key=lambda x: x[1],reverse=False)
-    result_query = [img[0] for img in result_query]
-    dict_query["ans_ids"] = result_query
-    prediction_cat_results.append(dict_query)
-
-# Save the list of dictionaries to the JSON file
-with open('cat_results', "w") as json_file:
-    json.dump(prediction_cat_results, json_file, indent=4)
-
-# Evaluation
-print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
