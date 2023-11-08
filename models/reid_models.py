@@ -62,22 +62,26 @@ class ReidTrunkModel(pl.LightningModule):
         self.num_part = 10
 
     def forward(self, x):
-        x_proc = self.backbone(x)
-        body_feat = self.gap(x_proc)
-        part = {}
-        #get eight part feature
-        for i in range(self.num_part):
-            part[i] = body_feat[:, :, :, i]                    
-        body_feature = torch.cat((part[0], part[1], part[2], part[3], part[4], part[5], part[6], part[7], part[8], part[9]), dim=1) 
-        # Flatten to (Batches, 2560)
-        body_feature = body_feature.view(body_feature.shape[0], -1)  
 
-        # Put zeros if trunk is a black image
+        # Create an empty output
+        body_feature = torch.zeros((x.shape[0],self.embedding_size) , dtype=torch.float, device = 'cuda:0')
+
+        # Go for every image in the batch
         for idx, trunk_image in enumerate(x):
             if (trunk_image == torch.zeros((3, 64,128) , dtype=torch.float, device = 'cuda:0')).all():
                 body_feature[idx] = torch.zeros((self.embedding_size), dtype=torch.float, device = 'cuda:0')
+            else:
+                x_proc = self.backbone(trunk_image.unsqueeze(0))
+                body_feat = self.gap(x_proc)
+                part = {}
+                #get eight part feature
+                for i in range(self.num_part):
+                    part[i] = body_feat[:, :, :, i]                    
+                body_part_feature = torch.cat((part[0], part[1], part[2], part[3], part[4], part[5], part[6], part[7], part[8], part[9]), dim=1) 
+                # Flatten to (Batches, 2560)
+                body_feature[idx] = body_part_feature.flatten() 
 
-        # Return the final embedding
+        # Return the body feature
         return body_feature
 
 
@@ -130,45 +134,48 @@ class ReidLimbsModel(pl.LightningModule):
         self.gap4 = nn.AdaptiveAvgPool2d((1, 1))
         self.gap5 = nn.AdaptiveAvgPool2d((1, 1))
         self.gap6 = nn.AdaptiveAvgPool2d((1, 1))
-
+        
     def forward(self, l_leg,r_leg,l_thig,r_thig,l_shank,r_shank,f_tail,r_tail):
 
         part_feat = {}
-        part_feat[1] = self.left_leg_model(l_leg)
-        part_feat[2] = self.right_leg_model(r_leg)
-        part_feat[3] = self.right_thig_model(r_thig)
-        part_feat[4] = self.right_shank_model(r_shank)
-        part_feat[5] = self.left_thig_model(l_thig)
-        part_feat[6] = self.left_shank_model(l_shank)
-        part_feat[7] = self.front_tail_model(f_tail)
-        part_feat[8] = self.rear_tail_model(r_tail)
+        part_feat[1] = torch.zeros((l_leg.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[2] = torch.zeros((r_leg.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[3] = torch.zeros((r_thig.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[4] = torch.zeros((r_shank.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[5] = torch.zeros((l_thig.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[6] = torch.zeros((l_shank.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[7] = torch.zeros((f_tail.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
+        part_feat[8] = torch.zeros((r_tail.shape[0],256,4,4), dtype=torch.float, device = 'cuda:0')
 
-        # Create a clone of the outcomes to replace by zeros when correspond            
-        proc_part_feat = {}
-        for k,v in part_feat.items():
-            proc_part_feat[k] = v.clone()
-
+        
         for idx, img_thig in enumerate(r_thig):
             if (img_thig == torch.zeros((3, 64,64) , dtype=torch.float, device = 'cuda:0')).all():
-                proc_part_feat[3][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+                part_feat[3][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+            else:
+                part_feat[3][idx] = self.right_thig_model(img_thig.unsqueeze(0))
 
         for idx, img_shank in enumerate(r_shank):
             if (img_shank == torch.zeros((3, 64,64) , dtype=torch.float, device = 'cuda:0')).all():
-                proc_part_feat[4][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+                part_feat[4][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+            else:
+                part_feat[4][idx] = self.right_shank_model(img_shank.unsqueeze(0))
 
         for idx, img_thig in enumerate(l_thig):
             if (img_thig == torch.zeros((3, 64,64) , dtype=torch.float, device = 'cuda:0')).all():
-                proc_part_feat[5][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
-
+                part_feat[5][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+            else:
+                part_feat[5][idx] = self.left_thig_model(img_thig.unsqueeze(0))
         for idx, img_shank in enumerate(l_shank):
             if (img_shank == torch.zeros((3, 64,64) , dtype=torch.float, device = 'cuda:0')).all():
-                proc_part_feat[6][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
-
+                part_feat[6][idx] = torch.zeros((256,4,4), dtype=torch.float, device = 'cuda:0')
+            else:
+                part_feat[6][idx] = self.left_shank_model(img_shank.unsqueeze(0))
+            
         # Fusion of parts. Thigs and shanks
-        behind_top = torch.add(proc_part_feat[3], proc_part_feat[5])
-        behind_down = torch.add(proc_part_feat[4], proc_part_feat[6])
+        behind_top = torch.add(part_feat[3], part_feat[5])
+        behind_down = torch.add(part_feat[4], part_feat[6])
 
-        new_parts_x = [proc_part_feat[1], proc_part_feat[2], behind_top, behind_down,proc_part_feat[7],proc_part_feat[8]]
+        new_parts_x = [part_feat[1], part_feat[2], behind_top, behind_down,part_feat[7],part_feat[8]]
         new_part_feat = {}
 
         # Implement layer4 of Resnet34
@@ -201,12 +208,12 @@ class ReidLimbsModel(pl.LightningModule):
         # Check again if some of the previous layers are zero. 
 
         # Put zeros if it is a black image    
-        for idx, part_feat1 in enumerate(proc_part_feat[1]):
+        for idx, part_feat1 in enumerate(part_feat[1]):
             if (part_feat1 == torch.zeros((256, 4,4) , dtype=torch.float, device = 'cuda:0')).all():
                 new_part_feat[1][idx] = torch.zeros((512,1,1), dtype=torch.float, device = 'cuda:0')
 
         # Put zeros if it is a black image    
-        for idx, part_feat2 in enumerate(proc_part_feat[2]):
+        for idx, part_feat2 in enumerate(part_feat[2]):
             if (part_feat2 == torch.zeros((256, 4,4) , dtype=torch.float, device = 'cuda:0')).all():
                 new_part_feat[2][idx] = torch.zeros((512,1,1), dtype=torch.float, device = 'cuda:0')
 
@@ -221,12 +228,12 @@ class ReidLimbsModel(pl.LightningModule):
                 new_part_feat[4][idx] = torch.zeros((512,1,1), dtype=torch.float, device = 'cuda:0')
 
         # Put zeros if it is a black image    
-        for idx, part_feat7 in enumerate(proc_part_feat[7]):
+        for idx, part_feat7 in enumerate(part_feat[7]):
             if (part_feat7 == torch.zeros((256, 4,4) , dtype=torch.float, device = 'cuda:0')).all():
                 new_part_feat[5][idx] = torch.zeros((256,1,1), dtype=torch.float, device = 'cuda:0')
 
         # Put zeros if it is a black image    
-        for idx, part_feat8 in enumerate(proc_part_feat[8]):
+        for idx, part_feat8 in enumerate(part_feat[8]):
             if (part_feat8 == torch.zeros((256, 4,4) , dtype=torch.float, device = 'cuda:0')).all():
                 new_part_feat[6][idx] = torch.zeros((256,1,1), dtype=torch.float, device = 'cuda:0')
 

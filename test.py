@@ -92,9 +92,9 @@ for query_im in range(0, len(eval_model.pred_img_id)):
     prediction_cat_results.append(dict_query)
 
 # Save the list of dictionaries to the JSON file
-with open('baseline_cat_results', "w") as json_file:
+with open('cat_results', "w") as json_file:
     json.dump(prediction_cat_results, json_file, indent=4)
 
 # Evaluation
-print(evaluate(Config().evaluation_file,'baseline_cat_results',phase_codename='dev'))
+print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
 

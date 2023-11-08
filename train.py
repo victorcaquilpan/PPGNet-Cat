@@ -1,17 +1,9 @@
-
 # Load basic libraries
-import numpy as np
 import torch
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
-import pandas as pd
-import json
-from pytorch_lightning.callbacks import ModelCheckpoint
 
 # Complementary scripts
-from utils.evaluation import evaluate
-from utils.re_ranking import re_ranking
-from utils.cosine_similarity import cosine_similarity
 from losses import make_loss_with_parameters
 from datasets.dataloader import ReidDataModule
 from models.pl_model import ReidCatModel
@@ -40,8 +32,7 @@ class Config():
     number_workers = 8
     batch_size_train = 18 # 18 
     batch_size_test = 2
-    number_epochs = 2
-    save_n_epochs = 50
+    number_epochs = 5
     transformation = True
     size_full_image = (256,512)
     size_trunk_image = (64,128)
@@ -115,25 +106,11 @@ else:
 # Create a LearningRateMonitor callback
 lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval='epoch')
 
-# Create checkpoints
-if Config().arcface:
-    arcface = 'arcface_'
-else:
-    arcface = ''
-
-# Define the checkpoint
-checkpoint_callback = ModelCheckpoint(
-    dirpath='pretrained_weights/',
-    filename= arcface + Config().backbone + '_testing-{epoch:02d}',
-    every_n_epochs = Config().save_n_epochs,
-    save_weights_only=True,
-    save_top_k = -1)
-
 # Define the Trainer
 trainer = Trainer(max_epochs=Config().number_epochs,
                 accelerator='gpu', logger = True, 
                 enable_checkpointing=True, 
-                callbacks=[lr_monitor,checkpoint_callback],
+                callbacks=[lr_monitor],
                 precision = Config().precision, 
                 deterministic = Config().deterministic)
 
