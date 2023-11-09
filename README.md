@@ -8,4 +8,10 @@
 
 ![Samples of cat images](image_samples.jpg)
 
+# Code workflow
+
+In order to ensure a clear and right execution of the code, it is recommended to follow the next steps:
+
+**1) Organize the data**: The data
+
 
