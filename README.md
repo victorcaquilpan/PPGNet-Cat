@@ -13,6 +13,16 @@
 In order to ensure a clear and right execution of the code, it is recommended to follow the next steps:
 
 * **1) Organize the data**: The data should be arranged in the **data** folder in the next way:
-  * In **data/train** is necessary to count with the next three elements: 
+  * In **data/train** is necessary to count with the next three elements:
+     * **images**: A folder with the images available for training. These images are in .jpg.
+     * **keypoints_train.csv**: CSV File with the coordinates of the keypoints of cats per image.
+     * **train_anno.csv**: CSV file with the information of each class/entity per each image.
+     
+ * In **data/test** is necessary to have:
+     * **images**: A folder with the images available for testing.
+     * **gt_test_plain.json (optional)**: JSON file with the groundtruth of images. This is useful to evaluate the mode if it is needed.
+  
+* **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
+* **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.
 
-
+* **Demo**: There is a demo available (**demo.ipynb**) to run the evaluation model over a set of 20 images, creating the embedding of each image. The output of this script generates a **gif** animation with each one of the sample images and their estimated location in a two-dimension space, after using a T-SNE algorithm to reduce the 2560 embedding size to a size of 2. Below there is an example of this process.
