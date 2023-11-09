@@ -4,5 +4,6 @@
 
 # Feral cat images
 
+<p align="justify"> Images from camera traps are affected by different conditions. Overall the resolution of these images is 2048x1440 and 1920x1080 pixels. Below, there are some examples of images taken from a monitoring activity in Western Australia. Images were provided by Thylation and the Departmnet of Biodiversity, Consevation and Attractions (DBCA) of Western Australia. </p>
 
 
