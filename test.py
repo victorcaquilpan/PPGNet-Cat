@@ -26,7 +26,8 @@ class Config():
     backbone = 'resnet152'
     deterministic = [True, "warn"]
     precision = "16-mixed"
-    base_model = None
+    trained_model = 'best_model.pth'
+
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
@@ -51,7 +52,7 @@ trainer = Trainer(accelerator='gpu', logger = False,
                 deterministic = Config().deterministic)
 
 # Load the weights and biases
-eval_model.full_image_model.load_state_dict(torch.load('pretrained_weights/eval_model.pth'))
+eval_model.full_image_model.load_state_dict(torch.load('pretrained_weights/' + Config().trained_model))
 
 # # Evaluation of model
 predictions = trainer.predict(eval_model,dataloaders=cat_data.test_dataloader())

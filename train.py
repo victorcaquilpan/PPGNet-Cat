@@ -32,7 +32,7 @@ class Config():
     number_workers = 8
     batch_size_train = 18 # 18 
     batch_size_test = 2
-    number_epochs = 200
+    number_epochs = 10
     transformation = True
     size_full_image = (256,512)
     size_trunk_image = (64,128)
@@ -48,8 +48,9 @@ class Config():
     backbone = 'resnet152'
     deterministic = [True, "warn"]
     precision = "16-mixed"
-    mirrowed_data = True
+    mirrored_data = True
     include_cat_keypoints = True
+    min_images_per_entity = 10
     base_model = None
     retrain = True
 
@@ -63,8 +64,9 @@ cat_data = ReidDataModule(data_directory=Config(),
                             size_full_image = Config().size_full_image,
                             size_trunk_image = Config().size_trunk_image,
                             size_limb_image = Config.size_limb_image,
-                            mirrowed_images = Config().mirrowed_data,
-                            include_cat_keypoints=Config().include_cat_keypoints)
+                            mirrored_images = Config().mirrored_data,
+                            include_cat_keypoints=Config().include_cat_keypoints,
+                            min_images_per_entity = Config().min_images_per_entity)
 # Call the setup method
 cat_data.setup()
 

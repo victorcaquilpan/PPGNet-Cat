@@ -10,14 +10,24 @@ from .crop_images import trunk_extraction, limbs_extraction
 
 # Create a Reid Dataset
 class ReidDataset(Dataset):
-    def __init__(self,data_directory: str,transform_type: bool = False, subset: str = 'train',resized_full_image: tuple = (256,512),resized_trunk_image: tuple = (64,128),resized_limb_image: tuple = (64,64), mirrowed_images: bool = True,include_cat_keypoints = False):
+    def __init__(self,data_directory: str,
+                 transform_type: bool = False, 
+                 subset: str = 'train',
+                 resized_full_image: tuple = (256,512),
+                 resized_trunk_image: tuple = (64,128),
+                 resized_limb_image: tuple = (64,64), 
+                 mirrored_images: bool = False,
+                 include_cat_keypoints = False,
+                 min_images_per_entity = None):
+        
         # Save the train state
         self.subset = subset
         self.resized_full_image = resized_full_image
         self.resized_trunk_image = resized_trunk_image
         self.resized_limb_image = resized_limb_image
-        self.mirrowed_images = mirrowed_images
+        self.mirrored_images = mirrored_images
         self.include_cat_keypoints = include_cat_keypoints
+        self.min_images_per_entity = min_images_per_entity
 
         # Check folder 
         self.data_directory = data_directory    
@@ -25,24 +35,51 @@ class ReidDataset(Dataset):
         if self.subset == 'train' or self.subset == 'val':
             self.data = self.data_directory.cat_training_dir
             labels = pd.read_csv(self.data_directory.cat_anno_train_file)
-            # Filter mirrored images if necessary
-            if not self.mirrowed_images:
-                labels = labels.loc[labels['mirrow'] == False]
+            labels['mirror'] = False
+            # Increase data for mirror images if necessary
+            if self.mirrored_images:
+                mirror_labels = labels.copy()
+                mirror_labels['mirror'] = True
+
+                # Check last class
+                last_class = max(labels['entityid'])
+                mirror_labels['entityid'] = mirror_labels['entityid'] + last_class + 1
+
+                # Create the final dataset
+                labels = pd.concat([labels, mirror_labels], axis=0)
+                labels.reset_index(drop=True, inplace=True)
+
+            # If we want to tackle imbalance problem
+            if self.min_images_per_entity != None:
+                class_counts = labels['entityid'].value_counts()
+
+                target_samples = self.min_images_per_entity
+                oversampled_dfs = []
+
+                for class_label, count in class_counts.items():
+                    class_df = labels[labels['entityid'] == class_label]
+                    if count < target_samples:
+                        oversampled_df = class_df.sample(target_samples - count, replace=True)
+                        oversampled_dfs.append(oversampled_df)
+
+                # Concatenate the original DataFrame with the oversampled DataFrames
+                labels = pd.concat([labels] + oversampled_dfs)
+
 
             if self.subset == 'train':
                 # Split in train and val
-                val_labels = labels.groupby('reid_folder').first().reset_index()
-                mask_labels = labels['new_name'].isin(val_labels['new_name'])
+                val_labels = labels.groupby('entityid').first().reset_index()
+                mask_labels = labels['filename'].isin(val_labels['filename'])
                 self.labels = labels[~mask_labels]
 
                 # Extract the keypoints
                 if include_cat_keypoints:
-                    self.keypoints = pd.read_csv(self.data_directory.keypoints_train,names=["kp", "x", "y", "img","e","ee"])
+                    self.keypoints = pd.read_csv(self.data_directory.keypoints_train)
                 else:
                     # Create an empty keypoint dataframe
                     self.keypoints = pd.DataFrame(columns=['img'])
             else:
-                self.labels = labels.groupby('reid_folder').first().reset_index()     
+                self.labels = labels.groupby('entityid').first().reset_index()     
         elif self.subset == 'test':
                 self.data = self.data_directory.cat_testing_dir
                 self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
@@ -148,7 +185,7 @@ class ReidDataset(Dataset):
 
         # Get the class and the image contain for a first image
 
-        img_tuple = entity['reid_folder'], entity['new_name']
+        img_tuple = entity['entityid'], entity['filename']
 
         # Read the img
         img = cv2.imread(self.data + img_tuple[1])
@@ -168,7 +205,7 @@ class ReidDataset(Dataset):
             img = self.transform_test(image = np.array(img))['image']
 
         # Check if we need to return the original or mirror entity:
-        if (self.subset == 'train' or self.subset == 'val') and entity['mirrow'] == True:
+        if (self.subset == 'train' or self.subset == 'val') and entity['mirror'] == True:
             img = torch.flip(img, [2])
 
         # Return trunk and limbs
@@ -206,7 +243,7 @@ class ReidDataset(Dataset):
                 if all([val_point[point-1] != 0 for point in [3,14]]) and any([val_point[point-1] != 0 for point in [1,2]]) and any([val_point[point-1] != 0 for point in [4,6]]):
                     
                     # Define the trunk
-                    trunk_img = trunk_extraction(full_pose_image,coordinates_x,coordinates_y,self.resized_trunk_image,self.transform_trunk, entity['mirrow'])
+                    trunk_img = trunk_extraction(full_pose_image,coordinates_x,coordinates_y,self.resized_trunk_image,self.transform_trunk, entity['mirror'])
 
                 # In the case of not having enough points for trunk, enter a black image
                 else:
@@ -215,43 +252,43 @@ class ReidDataset(Dataset):
                 # Return limbs
                 # Crop the left leg
                 if  all([val_point[point] != 0 for point in [5,6]]):
-                    left_leg = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,6,7,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    left_leg = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,6,7,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     left_leg = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 
                 # Crop the right leg
                 if  all([val_point[point] != 0 for point in [3,4]]):
-                    right_leg = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,4,5,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    right_leg = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,4,5,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     right_leg = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the left thig
                 if  all([val_point[point] != 0 for point in [10,11]]):
-                    left_thig = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,11,12,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    left_thig = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,11,12,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     left_thig = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the right thig
                 if  all([val_point[point] != 0 for point in [7,8]]):
-                    right_thig = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,8,9,self.resized_limb_image, self.transform_limb, entity['mirrow'])
+                    right_thig = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,8,9,self.resized_limb_image, self.transform_limb, entity['mirror'])
                 else:
                     right_thig = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the left shank
                 if  all([val_point[point] != 0 for point in [11,12]]):
-                    left_shank = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,12,13,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    left_shank = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,12,13,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     left_shank = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the left shank
                 if  all([val_point[point] != 0 for point in [8,9]]):
-                    right_shank = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,9,10,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    right_shank = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,9,10,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     right_shank = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the front tail
                 if  all([val_point[point] != 0 for point in [13,15]]):
-                    front_tail = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,14,16,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    front_tail = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,14,16,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     front_tail = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 # Crop the rear tail
                 if  all([val_point[point] != 0 for point in [15,16]]):
-                    rear_tail = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,16,17,self.resized_limb_image,self.transform_limb, entity['mirrow'])
+                    rear_tail = limbs_extraction(full_pose_image,coordinates_x,coordinates_y,16,17,self.resized_limb_image,self.transform_limb, entity['mirror'])
                 else:
                     rear_tail = torch.zeros((3, self.resized_limb_image[0], self.resized_limb_image[1]), dtype=torch.float)
                 
