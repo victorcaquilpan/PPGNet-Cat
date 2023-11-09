@@ -9,7 +9,7 @@ from datasets.dataloader import ReidDataModule
 from models.pl_model import ReidCatModel
 
 # Set seed
-torch.manual_seed(1) 
+torch.manual_seed(123) 
 
 #Paramteres
 class Config():
@@ -32,7 +32,7 @@ class Config():
     number_workers = 8
     batch_size_train = 18 # 18 
     batch_size_test = 2
-    number_epochs = 5
+    number_epochs = 200
     transformation = True
     size_full_image = (256,512)
     size_trunk_image = (64,128)

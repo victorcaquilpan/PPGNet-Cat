@@ -11,7 +11,7 @@ from utils.cosine_similarity import cosine_similarity
 from utils.re_ranking import re_ranking
 from utils.evaluation import evaluate
 
-#Paramteres
+#Parameteres
 class Config():
     cat_testing_dir = 'data/test/images/'
     cat_anno_test_file = 'data/test/test_anno.csv'
@@ -21,7 +21,6 @@ class Config():
     batch_size_test = 2
     transformation = True
     size_full_image = (256,512)
-
     embeddings = 2560
     arcface = False
     backbone = 'resnet152'
@@ -54,7 +53,6 @@ trainer = Trainer(accelerator='gpu', logger = False,
 # Load the weights and biases
 eval_model.full_image_model.load_state_dict(torch.load('pretrained_weights/eval_model.pth'))
 
-
 # # Evaluation of model
 predictions = trainer.predict(eval_model,dataloaders=cat_data.test_dataloader())
 
@@ -69,7 +67,6 @@ for query_im in range(0, len(eval_model.pred_img_id)):
 
 # Get the reranked distance matrix
 reranked_dist = re_ranking(dist_matrix, dist_matrix, dist_matrix, k1=20, k2=6, lambda_value=0.3)
-
 
 # Create output list
 prediction_cat_results = []

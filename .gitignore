@@ -8,3 +8,4 @@ data/train/images/
 data/test/images/
 pretrained_weights/
 cat_results
+nohup.out

@@ -1,6 +1,7 @@
 # Import libraries
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 
 
 # Function to visualize images
@@ -28,3 +29,4 @@ def plot_metrics(train_loss,train_acc,val_loss, val_acc):
     ax1.legend(['Train', 'Val'])
     ax2.set_ylim(0, 1)
     plt.show()
+

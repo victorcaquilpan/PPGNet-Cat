@@ -196,6 +196,7 @@ class ReidLimbsModel(pl.LightningModule):
                 x = self.base4(x)
                 x = self.gap4(x)
                 new_part_feat[i+1] = x
+                
             #  For the tail, we are not including the base to keep them in a size of 256
             if i == 4:
                 x = self.gap5(x)
@@ -204,7 +205,6 @@ class ReidLimbsModel(pl.LightningModule):
                 x = self.gap6(x)
                 new_part_feat[i+1] = x
 
-        
         # Check again if some of the previous layers are zero. 
 
         # Put zeros if it is a black image    
