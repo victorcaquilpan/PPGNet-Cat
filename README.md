@@ -12,6 +12,7 @@
 
 In order to ensure a clear and right execution of the code, it is recommended to follow the next steps:
 
-**1) Organize the data**: The data
+* **1) Organize the data**: The data should be arranged in the **data** folder in the next way:
+  * In **data/train** is necessary to count with the next three elements: 
 
 
