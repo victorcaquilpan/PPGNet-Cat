@@ -26,3 +26,4 @@ In order to ensure a clear and right execution of the code, it is recommended to
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.
 
 * **Demo**: There is a demo available (**demo.ipynb**) to run the evaluation model over a set of 20 images, creating the embedding of each image. The output of this script generates a **gif** animation with each one of the sample images and their estimated location in a two-dimension space, after using a T-SNE algorithm to reduce the 2560 embedding size to a size of 2. Below there is an example of this process.
+![Representation of embeddings using UMAP](pred_sample.gif)
