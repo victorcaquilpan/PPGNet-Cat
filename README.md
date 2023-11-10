@@ -10,6 +10,7 @@
 
 # Code workflow
 
+<p align="justify">
 In order to ensure a clear and right execution of the code, it is recommended to follow the next steps:
 
 * **1) Organize the data**: The data should be arranged in the **data** folder in the next way:
@@ -24,6 +25,8 @@ In order to ensure a clear and right execution of the code, it is recommended to
   
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.
+
+ </p>
 
 * **Demo**: There is a demo available (**demo.ipynb**) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in **data/sample** directory), creating the embedding of each image. The output of this script generates a **gif** animation with each one of the sample images and their estimated location in a two-dimension space after using a [UMAP algorithm](https://github.com/lmcinnes/umap) to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.
   
