@@ -32,7 +32,7 @@ class Config():
     number_workers = 8
     batch_size_train = 18 # 18 
     batch_size_test = 2
-    number_epochs = 10
+    number_epochs = 250
     transformation = True
     size_full_image = (256,512)
     size_trunk_image = (64,128)
@@ -50,7 +50,7 @@ class Config():
     precision = "16-mixed"
     mirrored_data = True
     include_cat_keypoints = True
-    min_images_per_entity = 10
+    min_images_per_entity = 20
     base_model = None
     retrain = True
 

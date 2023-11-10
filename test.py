@@ -43,7 +43,7 @@ eval_model = ReidPrediction(
     backbone_model = Config().backbone,
     number_classes = Config().num_classes, 
     embedding_size = Config().embeddings,
-    arcface = False)
+    arcface = Config().arcface)
 
 # Create the trainer
 trainer = Trainer(accelerator='gpu', logger = False, 
@@ -92,6 +92,12 @@ for query_im in range(0, len(eval_model.pred_img_id)):
 # Save the list of dictionaries to the JSON file
 with open('cat_results', "w") as json_file:
     json.dump(prediction_cat_results, json_file, indent=4)
+
+
+# # Save the embeddings
+# predictions_test = eval_model.pred_embeddings
+# predictions_test = predictions_test.cpu().numpy()
+# np.save('embeddings_cats.npy', predictions_test)
 
 # Evaluation
 print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
