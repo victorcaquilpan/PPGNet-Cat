@@ -17,7 +17,7 @@ class Config():
     cat_anno_test_file = 'data/test/test_anno.csv'
     evaluation_file = 'data/test/gt_test_plain.json'
     number_workers = 8
-    num_classes = 100
+    num_classes = 300
     batch_size_test = 2
     transformation = True
     size_full_image = (256,512)
