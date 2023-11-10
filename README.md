@@ -18,13 +18,14 @@
      * **keypoints_train.csv**: CSV File with the coordinates of the keypoints of cats per image.
      * **train_anno.csv**: CSV file with the information of each class/entity per each image.
      
- * In **data/test** is necessary to have:
+  * In **data/test** is necessary to have:
      * **images**: A folder with the images available for testing.
      * **gt_test_plain.json (optional)**: JSON file with the groundtruth of images. This is useful to evaluate the mode if it is needed.
   
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
 
-<p align="justify"> <b>Demo</b>: There is a demo available (**demo.ipynb**) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in **data/sample** directory), creating the embedding of each image. The output of this script generates a **gif** animation with each one of the sample images and their estimated location in a two-dimension space after using a [UMAP algorithm](https://github.com/lmcinnes/umap) to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
+<p align="justify"> <b>Demo</b>: There is a demo available (<b>demo.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
+ a <a href="https://github.com/lmcinnes/umap">UMAP algorithm</a> to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
   
 ![Representation of embeddings using UMAP](pred_sample.gif)
