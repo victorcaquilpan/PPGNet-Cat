@@ -29,7 +29,6 @@ class Config():
     PRECISION = '16-mixed'
     TRAINED_MODEL = 'best_model.pth'
 
-
     # CAT_TESTING_DIR = 'data/tiger/test/images/'
     # CAT_ANNO_TEST_FILE = 'data/tiger/test/reid_list_test.csv'
     # EVALUATION_FILE = 'data/tiger/test/gt_test_plain.json'
