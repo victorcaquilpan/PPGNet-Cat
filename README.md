@@ -8,6 +8,22 @@
 
 ![Samples of cat images](images/image_samples.jpg)
 
+# Dependencies
+
+The main dependencies used in this project are:
+
+* scikit-learn                  1.3.0
+* torch                         2.0.1+cu118
+* torchmetrics                  1.0.3
+* torchvision                   0.15.2+cu118
+* pytorch-lightning             2.0.6
+* pytorch-metric-learning       2.3.0
+* opencv-python                 4.8.0.74
+* numpy                         1.24.3
+* albumentations                1.3.1
+* pandas                        2.0.3
+* Pillow                        10.0.0
+
 # Code workflow
 
 <p align="justify">In order to ensure a clear and right execution of the code, it is recommended to follow the next steps:
