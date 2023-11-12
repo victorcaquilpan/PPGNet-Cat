@@ -34,12 +34,12 @@ class ReidDataset(Dataset):
         self.data_directory = data_directory    
         # Define the data origin
         if self.subset == 'train' or self.subset == 'val':
-            self.data = self.data_directory.cat_training_dir
+            self.data = self.data_directory.CAT_TRAINING_DIR
             if 'tiger' in self.data:
-                labels = pd.read_csv(self.data_directory.cat_anno_train_file,names=['entityid','filename'])
+                labels = pd.read_csv(self.data_directory.CAT_ANNO_TRAIN_FILE,names=['entityid','filename'])
                 labels = labels.reset_index()
             else:
-                labels = pd.read_csv(self.data_directory.cat_anno_train_file)
+                labels = pd.read_csv(self.data_directory.CAT_ANNO_TRAIN_FILE)
             labels['mirror'] = False
             # Increase data for mirror images if necessary
             if self.mirrored_images:
@@ -110,18 +110,18 @@ class ReidDataset(Dataset):
                             self.keypoints = pd.concat([self.keypoints, data])
 
                     else:
-                        self.keypoints = pd.read_csv(self.data_directory.keypoints_train)
+                        self.keypoints = pd.read_csv(self.data_directory.KEYPOINTS_TRAIN)
                 else:
                     # Create an empty keypoint dataframe
                     self.keypoints = pd.DataFrame(columns=['img'])
             else:
                 self.labels = labels.groupby('entityid').first().reset_index()     
         elif self.subset == 'test':
-                self.data = self.data_directory.cat_testing_dir
-                if 'tiger' in self.data_directory.cat_testing_dir:
-                    self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
+                self.data = self.data_directory.CAT_TESTING_DIR  
+                if 'tiger' in self.data_directory.CAT_TESTING_DIR:  
+                    self.labels = pd.read_csv(self.data_directory.CAT_ANNO_TEST_FILE)
                 else:
-                    self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
+                    self.labels = pd.read_csv(self.data_directory.CAT_ANNO_TEST_FILE)
             
         # Check potential transformations
         self.transform_type = transform_type

@@ -14,50 +14,50 @@ from utils.evaluation_tiger import evaluate_tiger
 
 #Parameteres
 class Config():
-    cat_testing_dir = 'data/test/images/'
-    cat_anno_test_file = 'data/test/test_anno.csv'
-    evaluation_file = 'data/test/gt_test_plain.json'
-    # cat_testing_dir = 'data/tiger/test/images/'
-    # cat_anno_test_file = 'data/tiger/test/reid_list_test.csv'
-    # evaluation_file = 'data/tiger/test/gt_test_plain.json'
+    CAT_TESTING_DIR = 'data/test/images/'
+    CAT_ANNO_TEST_FILE = 'data/test/test_anno.csv'
+    EVALUATION_FILE = 'data/test/gt_test_plain.json'
+    NUMBER_WORKERS = 8
+    NUM_CLASSES = 300
+    BATCH_SIZE_TEST = 2
+    TRANSFORMATION = True
+    SIZE_FULL_IMAGE = (256,512)
+    EMBEDDING_SIZE = 2560
+    ARCFACE = False
+    BACKBONE = 'resnet152'
+    DETERMINISTIC = [True, "warn"]
+    PRECISION = '16-mixed'
+    TRAINED_MODEL = 'best_model.pth'
 
-    number_workers = 8
-    num_classes = 300
-    batch_size_test = 2
-    transformation = True
-    size_full_image = (256,512)
-    embeddings = 2560
-    arcface = False
-    backbone = 'resnet152'
-    deterministic = [True, "warn"]
-    precision = "16-mixed"
-    trained_model = 'best_model.pth'
 
+    # CAT_TESTING_DIR = 'data/tiger/test/images/'
+    # CAT_ANNO_TEST_FILE = 'data/tiger/test/reid_list_test.csv'
+    # EVALUATION_FILE = 'data/tiger/test/gt_test_plain.json'
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
-                            batch_size_test = Config().batch_size_test,
-                            transform=Config().transformation,
-                            num_workers= Config().number_workers, 
-                            size_full_image = Config().size_full_image)
+                            batch_size_test = Config().BATCH_SIZE_TEST,
+                            transform=Config().TRANSFORMATION,
+                            num_workers= Config().NUMBER_WORKERS, 
+                            size_full_image = Config().SIZE_FULL_IMAGE)
 # Call the setup method
 cat_data.setup()
 
 # Create the model
 eval_model = ReidPrediction(
-    backbone_model = Config().backbone,
-    number_classes = Config().num_classes, 
-    embedding_size = Config().embeddings,
-    arcface = Config().arcface)
+    backbone_model = Config().BACKBONE,
+    number_classes = Config().NUM_CLASSES, 
+    embedding_size = Config().EMBEDDING_SIZE,
+    arcface = Config().ARCFACE)
 
 # Create the trainer
 trainer = Trainer(accelerator='gpu', logger = False, 
                 enable_checkpointing=False, 
-                precision = Config().precision, 
-                deterministic = Config().deterministic)
+                precision = Config().PRECISION, 
+                deterministic = Config().DETERMINISTIC)
 
 # Load the weights and biases
-eval_model.full_image_model.load_state_dict(torch.load('pretrained_weights/' + Config().trained_model))
+eval_model.full_image_model.load_state_dict(torch.load('pretrained_weights/' + Config().TRAINED_MODEL))
 
 # # Evaluation of model
 predictions = trainer.predict(eval_model,dataloaders=cat_data.test_dataloader())
@@ -99,8 +99,8 @@ with open('cat_results', "w") as json_file:
     json.dump(prediction_cat_results, json_file, indent=4)
 
 # Evaluation
-if 'tiger' in Config().cat_anno_test_file:
-    print(evaluate_tiger(Config().evaluation_file,'cat_results',phase_codename='dev'))
+if 'tiger' in Config().CAT_ANNO_TEST_FILE:
+    print(evaluate_tiger(Config().EVALUATION_FILE,'cat_results',phase_codename='dev'))
 else:
-    print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
+    print(evaluate(Config().EVALUATION_FILE,'cat_results',phase_codename='dev'))
 
