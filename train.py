@@ -13,13 +13,13 @@ torch.manual_seed(123)
 
 #Paramteres
 class Config():
-    # cat_training_dir = 'data/train/images/'  
-    # cat_anno_train_file = 'data/train/train_anno.csv'
-    # keypoints_train = 'data/train/keypoints_train.csv'
+    cat_training_dir = 'data/train/images/'  
+    cat_anno_train_file = 'data/train/train_anno.csv'
+    keypoints_train = 'data/train/keypoints_train.csv'
 
-    cat_training_dir = 'data/tiger/train/images/'
-    cat_anno_train_file = 'data/tiger/train/reid_list_train.csv'
-    keypoints_train = 'data/tiger/train/reid_keypoints_train.json'
+    # cat_training_dir = 'data/tiger/train/images/'
+    # cat_anno_train_file = 'data/tiger/train/reid_list_train.csv'
+    # keypoints_train = 'data/tiger/train/reid_keypoints_train.json'
 
     cat_testing_dir = 'data/test/images/'
     #cat_testing_dir = 'data/feral_cat/melbourne/reid_images/'

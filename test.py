@@ -22,7 +22,7 @@ class Config():
     # evaluation_file = 'data/tiger/test/gt_test_plain.json'
 
     number_workers = 8
-    num_classes = 600
+    num_classes = 300
     batch_size_test = 2
     transformation = True
     size_full_image = (256,512)
@@ -31,7 +31,7 @@ class Config():
     backbone = 'resnet152'
     deterministic = [True, "warn"]
     precision = "16-mixed"
-    trained_model = 'eval_model.pth'
+    trained_model = 'best_model.pth'
 
 
 # Creating dataloader
