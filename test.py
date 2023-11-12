@@ -10,14 +10,19 @@ from datasets.dataloader import ReidDataModule
 from utils.cosine_similarity import cosine_similarity
 from utils.re_ranking import re_ranking
 from utils.evaluation import evaluate
+from utils.evaluation_tiger import evaluate_tiger
 
 #Parameteres
 class Config():
     cat_testing_dir = 'data/test/images/'
     cat_anno_test_file = 'data/test/test_anno.csv'
     evaluation_file = 'data/test/gt_test_plain.json'
+    # cat_testing_dir = 'data/tiger/test/images/'
+    # cat_anno_test_file = 'data/tiger/test/reid_list_test.csv'
+    # evaluation_file = 'data/tiger/test/gt_test_plain.json'
+
     number_workers = 8
-    num_classes = 300
+    num_classes = 600
     batch_size_test = 2
     transformation = True
     size_full_image = (256,512)
@@ -26,7 +31,7 @@ class Config():
     backbone = 'resnet152'
     deterministic = [True, "warn"]
     precision = "16-mixed"
-    trained_model = 'best_model.pth'
+    trained_model = 'eval_model.pth'
 
 
 # Creating dataloader
@@ -94,5 +99,8 @@ with open('cat_results', "w") as json_file:
     json.dump(prediction_cat_results, json_file, indent=4)
 
 # Evaluation
-print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
+if 'tiger' in Config().cat_anno_test_file:
+    print(evaluate_tiger(Config().evaluation_file,'cat_results',phase_codename='dev'))
+else:
+    print(evaluate(Config().evaluation_file,'cat_results',phase_codename='dev'))
 

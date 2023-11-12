@@ -7,6 +7,7 @@ import albumentations as albu
 from albumentations.pytorch import ToTensorV2
 import cv2
 from .crop_images import trunk_extraction, limbs_extraction
+import json
 
 # Create a Reid Dataset
 class ReidDataset(Dataset):
@@ -34,7 +35,11 @@ class ReidDataset(Dataset):
         # Define the data origin
         if self.subset == 'train' or self.subset == 'val':
             self.data = self.data_directory.cat_training_dir
-            labels = pd.read_csv(self.data_directory.cat_anno_train_file)
+            if 'tiger' in self.data:
+                labels = pd.read_csv(self.data_directory.cat_anno_train_file,names=['entityid','filename'])
+                labels = labels.reset_index()
+            else:
+                labels = pd.read_csv(self.data_directory.cat_anno_train_file)
             labels['mirror'] = False
             # Increase data for mirror images if necessary
             if self.mirrored_images:
@@ -74,7 +79,38 @@ class ReidDataset(Dataset):
 
                 # Extract the keypoints
                 if include_cat_keypoints:
-                    self.keypoints = pd.read_csv(self.data_directory.keypoints_train)
+                    if 'tiger' in self.data:
+                        with open(self.data_directory.keypoints_train, 'r') as json_file:
+                            # Load the JSON data
+                            data_json = json.load(json_file)
+
+                        # Convert to the dataframe format
+                        self.keypoints = pd.DataFrame(columns=['kp','x','y','img'])
+                        for img, keypoints in data_json.items():
+
+                            validation_points = keypoints[2::3]
+                            x_values_points = keypoints[::3]
+                            y_values_points = keypoints[1::3]
+
+                            img_sequence = []
+                            x_values = []
+                            y_values = []
+                            kp_values = []
+
+                            for idx, val_point in enumerate(validation_points):
+                                if val_point != 0:
+                                    img_sequence.append(img)
+                                    x_values.append(x_values_points[idx])
+                                    y_values.append(y_values_points[idx])
+                                    kp_values.append(idx+1)
+
+                            data = {'kp': kp_values, 'x': x_values, 'y': y_values, 'img': img_sequence}
+                            data = pd.DataFrame(data)
+
+                            self.keypoints = pd.concat([self.keypoints, data])
+
+                    else:
+                        self.keypoints = pd.read_csv(self.data_directory.keypoints_train)
                 else:
                     # Create an empty keypoint dataframe
                     self.keypoints = pd.DataFrame(columns=['img'])
@@ -82,7 +118,10 @@ class ReidDataset(Dataset):
                 self.labels = labels.groupby('entityid').first().reset_index()     
         elif self.subset == 'test':
                 self.data = self.data_directory.cat_testing_dir
-                self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
+                if 'tiger' in self.data_directory.cat_testing_dir:
+                    self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
+                else:
+                    self.labels = pd.read_csv(self.data_directory.cat_anno_test_file)
             
         # Check potential transformations
         self.transform_type = transform_type

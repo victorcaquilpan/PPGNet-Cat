@@ -13,9 +13,13 @@ torch.manual_seed(123)
 
 #Paramteres
 class Config():
-    cat_training_dir = 'data/train/images/'  
-    cat_anno_train_file = 'data/train/train_anno.csv'
-    keypoints_train = 'data/train/keypoints_train.csv'
+    # cat_training_dir = 'data/train/images/'  
+    # cat_anno_train_file = 'data/train/train_anno.csv'
+    # keypoints_train = 'data/train/keypoints_train.csv'
+
+    cat_training_dir = 'data/tiger/train/images/'
+    cat_anno_train_file = 'data/tiger/train/reid_list_train.csv'
+    keypoints_train = 'data/tiger/train/reid_keypoints_train.json'
 
     cat_testing_dir = 'data/test/images/'
     #cat_testing_dir = 'data/feral_cat/melbourne/reid_images/'
@@ -30,7 +34,7 @@ class Config():
     #evaluation_file = 'data/feral_cat/gt_test_plain_combined.json'
 
     number_workers = 8
-    batch_size_train = 18 # 18 
+    batch_size_train = 22 # 18 
     batch_size_test = 2
     number_epochs = 250
     transformation = True
@@ -41,7 +45,7 @@ class Config():
     sch_gamma = 0.5
     sch_warmup_factor = 0.01
     sch_warmup_iter = 25    
-    num_classes = 100
+    num_classes = 600
     embeddings = 2560
     arcface = False
     lr_main = 0.00025
@@ -50,10 +54,9 @@ class Config():
     precision = "16-mixed"
     mirrored_data = True
     include_cat_keypoints = True
-    min_images_per_entity = 20
+    min_images_per_entity = 8
     base_model = None
     retrain = True
-
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
@@ -74,35 +77,24 @@ cat_data.setup()
 # Create our main loss function
 loss_fn = make_loss_with_parameters(Config().num_classes)
 
-# Create the main model
-if Config().base_model != None:
 
-    # Load the parameters from a previous implementation
-    model = ReidCatModel.load_from_checkpoint('pretrained_weights/' + Config().base_model, 
-                                        backbone_model = Config().backbone,
-                                        number_classes=Config().num_classes, 
-                                        embedding_size = Config().embeddings, 
-                                        main_loss = loss_fn,
-                                        steps_main_opt=Config().steps_main_opt,
-                                        lr_main = Config().lr_main,
-                                        arcface = Config().arcface,
-                                        num_epochs = Config().number_epochs,
-                                        sch_gamma = Config().sch_gamma,
-                                        sch_warmup_factor = Config().sch_warmup_factor,
-                                        sch_warmup_iter = Config().sch_warmup_iter)
-else:
-    # Create a model
-    model = ReidCatModel(backbone_model= Config().backbone,
-                    number_classes=Config().num_classes, 
-                    embedding_size = Config().embeddings, 
-                    main_loss = loss_fn,
-                    steps_main_opt=Config().steps_main_opt,
-                    lr_main = Config().lr_main,
-                    arcface = Config().arcface,
-                    num_epochs = Config().number_epochs,
-                    sch_gamma = Config().sch_gamma,
-                    sch_warmup_factor = Config().sch_warmup_factor,
-                    sch_warmup_iter = Config().sch_warmup_iter)
+# Create a model
+model = ReidCatModel(backbone_model= Config().backbone,
+                number_classes=Config().num_classes, 
+                embedding_size = Config().embeddings, 
+                main_loss = loss_fn,
+                steps_main_opt=Config().steps_main_opt,
+                lr_main = Config().lr_main,
+                arcface = Config().arcface,
+                num_epochs = Config().number_epochs,
+                sch_gamma = Config().sch_gamma,
+                sch_warmup_factor = Config().sch_warmup_factor,
+                sch_warmup_iter = Config().sch_warmup_iter)
+
+if Config().base_model:
+    # Load the weights and biases
+    model.load_state_dict(torch.load('pretrained_weights/' + Config().base_model))
+    print('loaded')
 
 
 # Create a LearningRateMonitor callback
@@ -116,7 +108,6 @@ trainer = Trainer(max_epochs=Config().number_epochs,
                 precision = Config().precision, 
                 deterministic = Config().deterministic)
 
-
 if Config.retrain:
     # Training
     trainer.fit(model = model,
@@ -125,6 +116,8 @@ if Config.retrain:
 
 # Save the weights and biases    
 torch.save(model.model.full_image_model.state_dict(),'pretrained_weights/eval_model.pth')
+torch.save(model.state_dict(),'pretrained_weights/full_model.pth')
+
 
 # Printing message
 print('Training was done successfully! Model was saved in "pretrained weights directory"')
