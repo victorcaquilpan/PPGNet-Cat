@@ -44,7 +44,7 @@ The main dependencies used in this project are:
 <p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
  a <a href="https://github.com/lmcinnes/umap">UMAP algorithm</a> to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
   
-![Representation of embeddings using UMAP](images/pred_sample.gif)
+![Representation of embeddings using UMAP](images/pred_samples.gif)
 
 <p align="justify"> <b>Demo2</b>: A second demonstration (<b>demo2.ipynb</b>) is provided for executing the evaluation model on a collection of 20 images to produce embeddings for each image. By employing Cosine similarity, distances between each embedding are obtained. Subsequently, by manually establishing a threshold (e.g., set at 0.15), it becomes possible to ascertain whether two images depict the same or different cats.
 
