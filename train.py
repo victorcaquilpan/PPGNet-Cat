@@ -11,7 +11,7 @@ from models.pl_model import ReidCatModel
 # Set seed
 torch.manual_seed(123) 
 
-#Paramteres
+#Parameteres
 class Config():
     cat_training_dir = 'data/train/images/'  
     cat_anno_train_file = 'data/train/train_anno.csv'
@@ -21,22 +21,10 @@ class Config():
     # cat_anno_train_file = 'data/tiger/train/reid_list_train.csv'
     # keypoints_train = 'data/tiger/train/reid_keypoints_train.json'
 
-    cat_testing_dir = 'data/test/images/'
-    #cat_testing_dir = 'data/feral_cat/melbourne/reid_images/'
-    #cat_testing_dir = 'data/feral_cat/test_fusion/'
-    
-    cat_anno_test_file = 'data/test/test_anno.csv'
-    #cat_anno_test_file = 'data/feral_cat/melbourne/anno_test_data.csv'
-    #cat_anno_test_file = 'data/feral_cat/anno_cat_combined_data.csv'
-    
-    evaluation_file = 'data/test/gt_test_plain.json'
-    #evaluation_file = 'data/feral_cat/melbourne/gt_test_plain.json'
-    #evaluation_file = 'data/feral_cat/gt_test_plain_combined.json'
-
     number_workers = 8
-    batch_size_train = 22 # 18 
-    batch_size_test = 2
-    number_epochs = 250
+    batch_size_train = 22
+    batch_size_val = 2
+    number_epochs = 300
     transformation = True
     size_full_image = (256,512)
     size_trunk_image = (64,128)
@@ -61,7 +49,7 @@ class Config():
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
                             batch_size_train = Config().batch_size_train,
-                            batch_size_test = Config().batch_size_test,
+                            batch_size_val = Config().batch_size_val,
                             transform=Config().transformation,
                             num_workers= Config().number_workers, 
                             size_full_image = Config().size_full_image,

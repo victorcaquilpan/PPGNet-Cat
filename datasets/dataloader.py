@@ -8,6 +8,7 @@ class ReidDataModule(pl.LightningDataModule):
     def __init__(self,data_directory: str,
                  batch_size_train = None,
                  batch_size_test = None,
+                 batch_size_val = None,
                  transform: bool = False,
                  num_workers: int = 2,
                  size_full_image = None,
@@ -20,6 +21,7 @@ class ReidDataModule(pl.LightningDataModule):
         self.data_directory = data_directory
         self.batch_size_train = batch_size_train
         self.batch_size_test = batch_size_test
+        self.batch_size_val = batch_size_val
         self.num_workers = num_workers  
         self.transform = transform
         self.resized_full_image = size_full_image
@@ -59,7 +61,7 @@ class ReidDataModule(pl.LightningDataModule):
         train_dataloader = DataLoader(self.train_dataset,shuffle=True,batch_size=self.batch_size_train,num_workers=self.num_workers)
         return train_dataloader
     def val_dataloader(self):
-        val_dataloader = DataLoader(self.val_dataset,shuffle=False,batch_size=self.batch_size_test,num_workers=self.num_workers)
+        val_dataloader = DataLoader(self.val_dataset,shuffle=False,batch_size=self.batch_size_val,num_workers=self.num_workers)
         return val_dataloader
     def test_dataloader(self):
         test_dataloader = DataLoader(self.test_dataset,shuffle=False,batch_size=self.batch_size_test,num_workers=self.num_workers)
