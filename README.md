@@ -25,7 +25,9 @@
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
 
-<p align="justify"> <b>Demo</b>: There is a demo available (<b>demo.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
+<p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
  a <a href="https://github.com/lmcinnes/umap">UMAP algorithm</a> to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
   
 ![Representation of embeddings using UMAP](images/pred_sample.gif)
+
+<p align="justify"> <b>Demo2</b>: A second demonstration (<b>dem2o.ipynb</b>) is provided for executing the evaluation model on a collection of 20 images to produce embeddings for each image. By employing Cosine similarity, distances between each embedding are obtained. Subsequently, by manually establishing a threshold (e.g., set at 0.15), it becomes possible to ascertain whether two images depict the same or different cats.
