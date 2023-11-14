@@ -18,7 +18,7 @@ class Config():
     CAT_ANNO_TEST_FILE = 'data/test/test_anno.csv'
     EVALUATION_FILE = 'data/test/gt_test_plain.json'
     NUMBER_WORKERS = 8
-    NUM_CLASSES = 300
+    NUM_CLASSES = 600
     BATCH_SIZE_TEST = 2
     TRANSFORMATION = True
     SIZE_FULL_IMAGE = (256,512)
@@ -27,11 +27,7 @@ class Config():
     BACKBONE = 'resnet152'
     DETERMINISTIC = [True, "warn"]
     PRECISION = '16-mixed'
-    TRAINED_MODEL = 'best_model.pth'
-
-    # CAT_TESTING_DIR = 'data/tiger/test/images/'
-    # CAT_ANNO_TEST_FILE = 'data/tiger/test/reid_list_test.csv'
-    # EVALUATION_FILE = 'data/tiger/test/gt_test_plain.json'
+    TRAINED_MODEL = 'eval_model.pth'
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
@@ -98,8 +94,5 @@ with open('cat_results', "w") as json_file:
     json.dump(prediction_cat_results, json_file, indent=4)
 
 # Evaluation
-if 'tiger' in Config().CAT_ANNO_TEST_FILE:
-    print(evaluate_tiger(Config().EVALUATION_FILE,'cat_results',phase_codename='dev'))
-else:
-    print(evaluate(Config().EVALUATION_FILE,'cat_results',phase_codename='dev'))
+print(evaluate(Config().EVALUATION_FILE,'cat_results',phase_codename='dev'))
 

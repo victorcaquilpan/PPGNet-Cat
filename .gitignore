@@ -11,3 +11,6 @@ cat_results
 nohup.out
 data/tiger/
 utils/evaluation_tiger.py
+train_tiger.py
+test_tiger.py
+pretrained_weights/tiger_weights

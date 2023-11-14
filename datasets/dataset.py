@@ -80,7 +80,7 @@ class ReidDataset(Dataset):
                 # Extract the keypoints
                 if include_cat_keypoints:
                     if 'tiger' in self.data:
-                        with open(self.data_directory.keypoints_train, 'r') as json_file:
+                        with open(self.data_directory.KEYPOINTS_TRAIN, 'r') as json_file:
                             # Load the JSON data
                             data_json = json.load(json_file)
 

@@ -19,7 +19,7 @@ class Config():
     NUMBER_WORKERS = 8
     BATCH_SIZE_TRAIN = 22
     BATCH_SIZE_VAL = 2
-    NUMBER_EPOCHS = 300
+    NUMBER_EPOCHS = 500
     TRANSFORMATION = True
     SIZE_FULL_IMAGE = (256,512)
     SIZE_TRUNK_IMAGE = (64,128)
@@ -40,10 +40,6 @@ class Config():
     MIN_IMAGES_PER_ENTITY = 8
     BASE_MODEL = None
     RETRAIN = True
-
-    # CAT_TRAINING_DIR = 'data/tiger/train/images/'
-    # CAT_ANNO_TRAIN_FILE = 'data/tiger/train/reid_list_train.csv'
-    # KEYPOINTS_TRAIN = 'data/tiger/train/reid_keypoints_train.json'
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),
