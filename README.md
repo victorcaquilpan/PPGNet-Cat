@@ -49,3 +49,5 @@ The main dependencies used in this project are:
 <p align="justify"> <b>Demo2</b>: A second demonstration (<b>demo2.ipynb</b>) is provided for executing the evaluation model on a collection of 20 images to produce embeddings for each image. By employing Cosine similarity, distances between each embedding are obtained. Subsequently, by manually establishing a threshold (e.g., set at 0.15), it becomes possible to ascertain whether two images depict the same or different cats.
 
 ![Evaluating similarities between images](images/check_similarities.gif)
+
+<p align="justify">There is available the <a href="https://www.dropbox.com/scl/fi/5ipvmx1xos6vfpmac28io/best_model.pth?rlkey=bc0c2d2rlkteiird17vmmf3bg&dl=0">weights of PPGNet-Cat</a> in a .pth file. To use in testing, or to run the demos, you need to download this file and put it in the folder 'pretrained_weights'.</p>
