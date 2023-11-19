@@ -50,7 +50,7 @@ PPGNet-Cat
           |--demo1.ipynb
           |--demo2.ipynb
           |--pretrained_weights
-          |--remaining folders (dataset, losses, etc.)
+          |--remaining folders (datasets, losses, etc.)
 ```  
 
 
