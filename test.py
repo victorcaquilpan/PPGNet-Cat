@@ -18,7 +18,7 @@ class Config():
     CAT_ANNO_TEST_FILE = 'data/test/test_anno.csv'
     EVALUATION_FILE = 'data/test/gt_test_plain.json'
     NUMBER_WORKERS = 8
-    NUM_CLASSES = 600
+    NUM_CLASSES = 300
     BATCH_SIZE_TEST = 2
     TRANSFORMATION = True
     SIZE_FULL_IMAGE = (256,512)
@@ -27,7 +27,7 @@ class Config():
     BACKBONE = 'resnet152'
     DETERMINISTIC = [True, "warn"]
     PRECISION = '16-mixed'
-    TRAINED_MODEL = 'eval_model.pth'
+    TRAINED_MODEL = 'best_model.pth'
 
 # Creating dataloader
 cat_data = ReidDataModule(data_directory=Config(),

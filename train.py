@@ -28,7 +28,7 @@ class Config():
     SCH_GAMMA = 0.5
     SCH_WARMUP_FACTOR = 0.01
     SCH_WARMUP_ITER = 25
-    NUM_CLASSES = 600
+    NUM_CLASSES = 300
     EMBEDDING_SIZE = 2560
     ARCFACE = False
     LR_MAIN = 0.00025
@@ -39,6 +39,7 @@ class Config():
     INCLUDE_CAT_KEYPOINTS = True
     MIN_IMAGES_PER_ENTITY = 8
     BASE_MODEL = None
+    NAME_OUTPUT_MODEL = 'eval_model.pth'
     RETRAIN = True
 
 # Creating dataloader
@@ -96,7 +97,7 @@ if Config.RETRAIN:
             val_dataloaders=cat_data.val_dataloader())
 
 # Save the weights and biases    
-torch.save(model.model.full_image_model.state_dict(),'pretrained_weights/eval_model.pth')
+torch.save(model.model.full_image_model.state_dict(),'pretrained_weights/' + Config.NAME_OUTPUT_MODEL)
 
 # Printing message
 print('Training was done successfully! Model was saved in "pretrained weights directory"')

@@ -13,4 +13,7 @@ data/tiger/
 utils/evaluation_tiger.py
 train_tiger.py
 test_tiger.py
+test_tiger_multiple_models.py
 pretrained_weights/tiger_weights
+yolov8_model.ipynb
+runs/
