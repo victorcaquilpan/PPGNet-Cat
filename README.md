@@ -41,6 +41,16 @@ The main dependencies used in this project are:
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
 
+```
+PPGNet-Cat
+          |--train.py
+          |--test.py
+          |--demo1.ipynb
+          |--demo2.ipynb
+          |--pretrained_weights
+```  
+
+
 <p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
  a <a href="https://github.com/lmcinnes/umap">UMAP algorithm</a> to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
   
