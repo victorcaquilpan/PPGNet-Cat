@@ -41,6 +41,8 @@ The main dependencies used in this project are:
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
 
+In order to store the weights given from your training process, you need to create the "pretrained_weights" folder in the next way.
+
 ```
 PPGNet-Cat
           |--train.py
@@ -48,6 +50,7 @@ PPGNet-Cat
           |--demo1.ipynb
           |--demo2.ipynb
           |--pretrained_weights
+          |--remaining folders (dataset, losses, etc.)
 ```  
 
 
