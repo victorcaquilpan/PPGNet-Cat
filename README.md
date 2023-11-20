@@ -66,6 +66,7 @@ PPGNet-Cat
           |--test.py
           |--demo1.ipynb
           |--demo2.ipynb
+          |--data
           |--pretrained_weights
           |--remaining folders (datasets, losses, etc.)
 ```  
