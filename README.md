@@ -37,6 +37,26 @@ The main dependencies used in this project are:
   * In **data/test** is necessary to have:
      * **images**: A folder with the images available for testing.
      * **gt_test_plain.json (optional)**: JSON file with the groundtruth of images. This is useful to evaluate the mode if it is needed.
+   
+   Below is an example of the structure used for train and test.
+   
+  ```
+data
+    |--train
+            |--keypoints_train.csv
+            |--train_anno.csv
+            |--images
+                     |--1.jpg
+                     |--2.jpg
+                     ...
+   |--test
+            |--gt_test_plain.json
+            |--images
+                     |--1.jpg
+                     |--2.jpg
+                     ...
+                     
+  ```
   
 * **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
