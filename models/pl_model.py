@@ -98,7 +98,7 @@ class ReidCatModel(pl.LightningModule):
     def on_train_epoch_end(self):
         # Get the loss mean
         loss_train_epoch_mean = torch.stack(self.batch_train_loss).mean()
-        self.hist_train_loss.append(loss_train_epoch_mean.cpu().detach().numpy())
+        self.hist_train_loss.append(loss_train_epoch_mean.detach()) #.cpu().detach().numpy()
         # free up the memory
         self.batch_train_loss.clear()
 
@@ -112,7 +112,7 @@ class ReidCatModel(pl.LightningModule):
     def on_validation_epoch_end(self):
         # Get the loss mean
         loss_val_epoch_mean = torch.stack(self.batch_val_loss).mean()
-        self.hist_val_loss.append(loss_val_epoch_mean.cpu().detach().numpy())
+        self.hist_val_loss.append(loss_val_epoch_mean.detach())  #.cpu().detach().numpy()
         # free up the memory
         self.batch_val_loss.clear()
 
@@ -162,5 +162,7 @@ class ReidCatModel(pl.LightningModule):
 
     # Record metric
     def recorded_metrics(self):
+        self.hist_train_loss = [value.cpu().numpy() for value in self.hist_train_loss]
+        self.hist_val_loss = [value.cpu().numpy() for value in self.hist_val_loss]
         # We ignore the validation metrics within the sanity check
         return self.hist_train_loss, self.hist_train_acc, self.hist_val_loss[1: ], self.hist_val_acc[1:]
