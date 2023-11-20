@@ -38,7 +38,7 @@ The main dependencies used in this project are:
      * **images**: A folder with the images available for testing.
      * **gt_test_plain.json (optional)**: JSON file with the groundtruth of images. This is useful to evaluate the mode if it is needed.
    
-   Below is an example of the structure used for train and test.
+   Below is an example of the structure used for train and test.</p>
    
   ```
 data
@@ -58,7 +58,7 @@ data
                      
   ```
   
-* **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
+<p align="justify">* **2) Training**: For training just in necessary to run the script **train.py** able in the main directory. This process will create a **.pth** file with the weights and biases for our evaluation model.
 * **3) Testing**: For testing, just in necessary to run the script **test.py** able in the main directory. This script will make the inference over all the test subset and return the performance of the model using mAP, Rank-1 and Rank-5.</p>
 
 In order to store the weights given from your training process, you need to create the "pretrained_weights" folder in the next way.
