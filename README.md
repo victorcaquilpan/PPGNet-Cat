@@ -8,6 +8,14 @@
 
 ![Samples of cat images](images/image_samples.jpg)
 
+# Metrics
+
+Over a test dataset of 10 entities (not seen in the train subset), we got the next results.
+
+| mAP  | Rank-1 | Rank-5 |
+| ------------- | ------------- | --- |
+| 0.86   | 0.95  | 0.97.5 | 
+
 # Dependencies
 
 The main dependencies used in this project are:
