@@ -85,7 +85,7 @@ PPGNet-Cat
   
 ![Representation of embeddings using UMAP](images/pred_samples.gif)
 
-<p align="justify"> <b>Demo2</b>: A second demonstration (<b>demo2.ipynb</b>) is provided for executing the evaluation model on a collection of 20 images to produce embeddings for each image. By employing Cosine similarity, distances between each embedding are obtained. Subsequently, by manually establishing a threshold (e.g., set at 0.15), it becomes possible to ascertain whether two images depict the same or different cats.
+<p align="justify"> <b>Demo2</b>: A second demonstration (<b>demo2.ipynb</b>) is provided for executing the evaluation model on a collection of 20 images to produce embeddings for each image. By employing Cosine similarity, distances between each embedding are obtained. Subsequently, by manually establishing a threshold (e.g. set at 0.15), it becomes possible to ascertain whether two images depict the same or different cats.
 
 ![Evaluating similarities between images](images/check_similarities.gif)
 
