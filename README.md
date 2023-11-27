@@ -30,7 +30,7 @@ The main dependencies used in this project are:
 * numpy                         1.24.3
 * albumentations                1.3.1
 * pandas                        2.0.3
-* Pillow                        10.0.0
+* pillow                        10.0.0
 
 # Code workflow
 
