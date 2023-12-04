@@ -81,6 +81,8 @@ PPGNet-Cat
 
 <p align="justify"> For the training dataset, there is necessary to identify the coordinates of the keypoints of body's cat (whenever it is possible). The annotation of these keypoints in based on the <a href="https://cvwc2019.github.io/challenge.html">ATRW Dataset</a>. Below there is an illustration of these keypoints in feral cats body. </p>
 
+![Keypoints in body's cat](images/keypoints_example.jpg)
+
 # Demos
 
 <p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
