@@ -79,7 +79,7 @@ PPGNet-Cat
           |--remaining folders (datasets, losses, etc.)
 ```
 
-<p align="justify"> For the training dataset, there is necessary to identify the coordinates of the keypoints of body's cat (whenever it is possible). The annotation of these keypoints in based on the <a href="https://cvwc2019.github.io/challenge.html">ATRW Dataset</a>. Below there is an illustration of these keypoints in feral cats body. </p>
+<p align="justify"> For the training dataset, there is necessary to identify the coordinates of the keypoints of body's cat (whenever it is possible) in order to extract their specific body parts. The annotation of these keypoints in based on the <a href="https://cvwc2019.github.io/challenge.html">ATRW Dataset</a>. Below there is an illustration of the keypoints in a cat's body. </p>
 
 <p align="center">
 <img src="images/keypoints_example.jpg" width="500">
