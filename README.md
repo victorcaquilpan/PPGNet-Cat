@@ -85,6 +85,8 @@ PPGNet-Cat
 <img src="images/keypoints_example.jpg" width="500">
 </p>
 
+<p align="justify"> The data utilized for training is private, however, there is possible to use a feral cat dataset from <a href="https://datadryad.org/stash/dataset/doi:10.5061/dryad.69p8cz95w">Data Dryad</a> with images of labelled feral cats from Victoria's national parks, Australia.</p>
+
 # Demos
 
 <p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
