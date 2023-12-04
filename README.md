@@ -77,8 +77,11 @@ PPGNet-Cat
           |--data
           |--pretrained_weights
           |--remaining folders (datasets, losses, etc.)
-```  
+```
 
+<p align="justify"> For the training dataset, there is necessary to identify the keypoints of body's cat (whenever it is possible). The annotation of these keypoints in based on the <a href="https://cvwc2019.github.io/challenge.html">ATRW Dataset</a>. Below there is an illustration of these keypoints in feral cats body. </p>
+
+# Demos
 
 <p align="justify"> <b>Demo1</b>: There is a demo available (<b>demo1.ipynb</b>) to run the evaluation model over a set of 20 images randomly selected from our test subset (images are available in <b>data/sample</b> directory), creating the embedding of each image. The output of this script generates a <b>gif</b> animation with each one of the sample images and their estimated location in a two-dimension space after using 
  a <a href="https://github.com/lmcinnes/umap">UMAP algorithm</a> to reduce the 2560 embedding size to 2. Below there is an example of this process, where we can see how our model allocates images of the same entity close to each other and further from other groups. Here, each color represent a different entity.</p>
