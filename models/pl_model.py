@@ -153,11 +153,40 @@ class ReidCatModel(pl.LightningModule):
         accuracy = correct / total
         return accuracy
     
+    # DEfine the optimizer
+    def make_optimizer(self,model):
+        # Define main parameters
+        BASE_LR = 0.00025
+        WEIGHT_DECAY = 0.0005
+        BIAS_LR_FACTOR = 1
+        WEIGHT_DECAY_BIAS = 0.0005
+        OPTIMIZER_NAME = 'Adam'
+
+        params = []
+        for key, value in model.named_parameters():
+            if not value.requires_grad:
+                continue
+            lr = BASE_LR
+            weight_decay = WEIGHT_DECAY
+            if "bias" in key:
+                lr = BASE_LR * BIAS_LR_FACTOR
+                weight_decay = WEIGHT_DECAY_BIAS
+            params += [{"params": [value], "lr": lr, "weight_decay": weight_decay}]
+            optimizer = getattr(torch.optim, OPTIMIZER_NAME)(params)
+        return optimizer
+    
     # Configure optimizer
     def configure_optimizers(self):
         # Define optimizer
-        optimizer = optim.Adam(self.parameters(),lr = self.lr_main, weight_decay =  0.0005)
-        scheduler = lr_scheduler.WarmupMultiStepLR(optimizer,self.steps_main_opt, self.sch_gamma,self.sch_warmup_factor,self.sch_warmup_iter)
+
+    
+        #optimizer = optim.Adam(self.parameters(),lr = self.lr_main, weight_decay =  0.0005)
+        optimizer = self.make_optimizer(self.model)
+        scheduler = lr_scheduler.WarmupMultiStepLR(optimizer,
+                                                   self.steps_main_opt, 
+                                                   self.sch_gamma,
+                                                   self.sch_warmup_factor,
+                                                   self.sch_warmup_iter)
         return [optimizer], [scheduler]
 
     # Record metric

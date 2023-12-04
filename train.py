@@ -119,7 +119,7 @@ if __name__ == "__main__":
     parser.add_argument("--number_workers", type=int, default = 8)
     parser.add_argument("--batch_size_train",type = int, default=22)
     parser.add_argument("--batch_size_val",type = int, default = 2)
-    parser.add_argument("--number_epochs", type = int, default = 500)
+    parser.add_argument("--number_epochs", type = int, default = 200)
     parser.add_argument("--transformation", type = bool, default= True,help = "Incorporate data augmentation")
     parser.add_argument("--size_full_image", type = tuple, default = (256,512))
     parser.add_argument("--size_trunk_image", type = tuple, default = (64,128))
